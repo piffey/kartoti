@@ -3,6 +3,30 @@
 // Help content shown in the "?" modal. Kept as an HTML string so the app stays
 // a dependency-free static site that also runs from file:// without a server.
 window.HELP_HTML = `
+<h2>What is Kartoti?</h2>
+<p><strong>Kartoti</strong> (Lithuanian for "to repeat / to revise") is a
+practice tool for Lithuanian verb conjugation. Each round shows you one verb and
+asks you to type its forms for every grammatical person across the tenses you
+have switched on. Your answers are checked instantly, with the correct form
+shown when you slip up — diacritics count, so <code>š</code> is not the same as
+<code>s</code>.</p>
+
+<h3>How to use it</h3>
+<ol>
+  <li>Close this dialog and press <strong>New verb</strong> to get a verb.</li>
+  <li>The verb is shown the way dictionaries list it —
+      <em>infinitive, 3rd-person singular present, 3rd-person singular past</em>
+      (e.g. <code>dirbti, dirba, dirbo</code>). Those three "principal parts"
+      are what you need to derive every other form, so learn verbs in this
+      shape.</li>
+  <li>Fill in the boxes. Press <strong>Check all</strong> to grade them, or
+      <strong>Reveal answers</strong> to fill in the blanks.</li>
+  <li>Use <strong>Show tenses &amp; moods</strong> to turn individual tenses and
+      moods (imperative, conditional) on or off — all are on by default.</li>
+  <li>Need a letter that is not on your keyboard? Click it in the
+      <em>Lietuviškos raidės</em> bar at the top to copy it, then paste it in.</li>
+</ol>
+
 <h2>Lithuanian verb conjugation</h2>
 <p>Lithuanian verbs are sorted into <strong>three conjugations</strong> based on
 the ending of the <strong>3rd person present tense</strong> form (which is the
@@ -76,6 +100,76 @@ dirbsite, dirbs.</p>
 in <code>s, z, š, ž</code>, the cluster simplifies (e.g. <em>vežti</em> →
 veš + … ). These verbs can also collide with present-tense forms, so check a
 dictionary for stems ending in a sibilant.</div>
+
+<h3>Imperative (liepiamoji nuosaka)</h3>
+<p>Commands and requests ("do it!"). Only three persons are used —
+<em>tu</em>, <em>mes</em>, <em>jūs</em>. Take the infinitive stem (infinitive
+minus <code>-ti</code>) and add the endings below:</p>
+<table>
+  <tr><th>tu (sg.)</th><th>mes (let's …)</th><th>jūs (pl./polite)</th></tr>
+  <tr><td>-k</td><td>-kime</td><td>-kite</td></tr>
+</table>
+<p>Example — <strong>dirbti</strong>: dirbk, dirbkime, dirbkite.</p>
+<div class="note"><strong>Stem-final <code>k</code> or <code>g</code></strong>
+merges with the imperative <code>-k-</code>: <em>laukti</em> → lauk, laukime;
+<em>bėgti</em> → bėk, bėkime; <em>pirkti</em> → pirk, pirkime.</div>
+
+<h3>Conditional (tariamoji nuosaka)</h3>
+<p>"Would do" — hypotheticals, polite requests and wishes. Take the infinitive
+stem (infinitive minus <code>-ti</code>) and add:</p>
+<table>
+  <tr><th>aš</th><th>tu</th><th>jis</th><th>mes</th><th>jūs</th><th>jie</th></tr>
+  <tr><td>-čiau</td><td>-tum</td><td>-tų</td><td>-tume</td><td>-tute</td><td>-tų</td></tr>
+</table>
+<p>Example — <strong>dirbti</strong>: dirbčiau, dirbtum, dirbtų, dirbtume,
+dirbtute, dirbtų. ("Aš dirbčiau" = I would work.)</p>
+<div class="note">You will also hear the longer endings <code>-tumei</code> (tu),
+<code>-tumėme</code> (mes) and <code>-tumėte</code> (jūs); this app uses the
+shorter standard forms.</div>
+
+<h2>Cases verbs take</h2>
+<p>Every verb is shown with the <strong>case it governs</strong>, written as the
+question word its object answers. Learn this together with the verb — it tells
+you which ending the object noun needs.</p>
+<table>
+  <tr><th>Question word</th><th>Case</th><th>Example verb</th></tr>
+  <tr><td><code>ką?</code></td><td>accusative</td><td>matyti <em>ką?</em> (to see)</td></tr>
+  <tr><td><code>ko?</code></td><td>genitive</td><td>laukti <em>ko?</em> (to wait for)</td></tr>
+  <tr><td><code>kam?</code></td><td>dative</td><td>padėti <em>kam?</em> (to help)</td></tr>
+  <tr><td><code>kuo?</code></td><td>instrumental</td><td>tikėti <em>kuo?</em> (to believe in)</td></tr>
+</table>
+<div class="note">Some verbs take two objects (e.g. <em>duoti</em> ką? kam? — to
+give something to someone), and a few are intransitive (no object case).</div>
+
+<h2>Reflexive verbs (sangrąžiniai veiksmažodžiai)</h2>
+<p>Reflexive verbs carry the particle <code>-si</code>, showing that the action
+turns back on the doer (oneself). The verb <strong>mokyti</strong> means "to
+teach"; its reflexive <strong>mokytis</strong> means "to learn" (literally "to
+teach oneself").</p>
+
+<h3>Without a prefix: <code>-si</code> is a suffix at the very end</h3>
+<p>On a plain verb the particle sits at the end of every form and fuses with the
+ending. <strong>mokytis</strong> (present):</p>
+<table>
+  <tr><th>aš</th><th>tu</th><th>jis/ji</th><th>mes</th><th>jūs</th><th>jie/jos</th></tr>
+  <tr><td>mokausi</td><td>mokaisi</td><td>mokosi</td><td>mokomės</td><td>mokotės</td><td>mokosi</td></tr>
+</table>
+<p>The infinitive simply adds it too: mokyti → moky<strong>tis</strong>; prausti
+(to wash) → praus<strong>tis</strong> (to wash oneself).</p>
+
+<h3>With a prefix: the suffix jumps inward and becomes an infix</h3>
+<p>As soon as you attach a prefix, the reflexive particle moves to sit
+<em>between the prefix and the stem</em> as <code>-si-</code> — it is no longer
+at the end:</p>
+<table>
+  <tr><th>Plain (suffix)</th><th>Prefixed (infix after prefix)</th></tr>
+  <tr><td>mokytis</td><td>pa<strong>si</strong>mokyti, iš<strong>si</strong>mokyti</td></tr>
+  <tr><td>praustis</td><td>nu<strong>si</strong>prausti</td></tr>
+</table>
+<div class="note">So the rule of thumb: <strong>no prefix → <code>-si</code> at
+the end; prefix → <code>-si-</code> right after the prefix.</strong> Compare
+<em>mokausi</em> ("I am learning") with <em>aš pasimokysiu</em> ("I'll study a
+bit").</div>
 
 <h3>Common irregular / tricky verbs</h3>
 <ul>

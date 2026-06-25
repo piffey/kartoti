@@ -12,23 +12,37 @@
       <h1>Kartoti</h1>
       <p class="subtitle">Lithuanian verb conjugation practice</p>
     </div>
-    <button id="help-btn" class="help-btn" aria-label="Show conjugation help" title="Conjugation rules &amp; prefixes">?</button>
+    <div class="header-actions">
+      <button id="list-btn" class="help-btn" aria-label="Browse all verbs" title="Browse and pick a verb">☰</button>
+      <button id="help-btn" class="help-btn" aria-label="Show conjugation help" title="Conjugation rules &amp; prefixes">?</button>
+    </div>
   </header>
+
+  <!-- Special-character copy bar -->
+  <section class="char-bar" aria-label="Lithuanian special characters">
+    <span class="char-bar-label">Lietuviškos raidės — click to copy:</span>
+    <div id="char-chips" class="char-chips"></div>
+    <span id="char-copied" class="char-copied" aria-live="polite"></span>
+  </section>
 
   <main>
     <section class="controls">
       <button id="new-verb-btn" class="primary-btn">New verb</button>
       <button id="check-btn" class="secondary-btn">Check all</button>
       <button id="reveal-btn" class="secondary-btn">Reveal answers</button>
-      <label class="freq-toggle">
-        <input type="checkbox" id="freq-toggle" />
-        Include frequentative past
-      </label>
+    </section>
+
+    <section class="tense-toggles" aria-label="Tenses and moods to practice">
+      <span class="toggles-label">Show tenses &amp; moods:</span>
+      <div id="tense-toggles" class="toggles"></div>
     </section>
 
     <section id="verb-prompt" class="verb-prompt hidden">
       <h2 id="verb-infinitive"></h2>
+      <p class="principal-parts-label">infinitive · 3rd person present · 3rd person past</p>
       <p id="verb-translation" class="translation"></p>
+      <p id="verb-governs" class="verb-governs"></p>
+      <p id="verb-example" class="verb-example"></p>
       <p id="verb-class" class="verb-class"></p>
       <p id="score" class="score" aria-live="polite"></p>
     </section>
@@ -46,8 +60,23 @@
     </div>
   </div>
 
+  <!-- Verb list modal -->
+  <div id="list-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="All verbs">
+    <div class="modal-content">
+      <button id="list-close" class="modal-close" aria-label="Close verb list">&times;</button>
+      <h2>All verbs</h2>
+      <p class="list-hint">Click a verb to practise it.</p>
+      <input type="text" id="list-filter" class="list-filter" placeholder="Filter verbs…"
+             autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter verbs" />
+      <ul id="verb-list" class="verb-list"></ul>
+    </div>
+  </div>
+
   <footer class="app-footer">
-    <span id="verb-count"></span>
+    <p id="verb-count"></p>
+    <p class="contact">
+      <a href="https://piffey.net/about/" target="_blank" rel="noopener">Contact me</a>
+    </p>
   </footer>
 
   <script src="verbs.js"></script>
