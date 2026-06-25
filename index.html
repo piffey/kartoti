@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kartoti — Lithuanian Verb Conjugation Practice</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="title-block">
+      <h1>Kartoti</h1>
+      <p class="subtitle">Lithuanian verb conjugation practice</p>
+    </div>
+    <button id="help-btn" class="help-btn" aria-label="Show conjugation help" title="Conjugation rules &amp; prefixes">?</button>
+  </header>
+
+  <main>
+    <section class="controls">
+      <button id="new-verb-btn" class="primary-btn">New verb</button>
+      <button id="check-btn" class="secondary-btn">Check all</button>
+      <button id="reveal-btn" class="secondary-btn">Reveal answers</button>
+      <label class="freq-toggle">
+        <input type="checkbox" id="freq-toggle" />
+        Include frequentative past
+      </label>
+    </section>
+
+    <section id="verb-prompt" class="verb-prompt hidden">
+      <h2 id="verb-infinitive"></h2>
+      <p id="verb-translation" class="translation"></p>
+      <p id="verb-class" class="verb-class"></p>
+      <p id="score" class="score" aria-live="polite"></p>
+    </section>
+
+    <section id="conjugation-area" class="conjugation-area">
+      <p class="placeholder">Click <strong>New verb</strong> to begin.</p>
+    </section>
+  </main>
+
+  <!-- Help modal -->
+  <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+    <div class="modal-content">
+      <button id="help-close" class="modal-close" aria-label="Close help">&times;</button>
+      <div id="help-body"></div>
+    </div>
+  </div>
+
+  <footer class="app-footer">
+    <span id="verb-count"></span>
+  </footer>
+
+  <script src="verbs.js"></script>
+  <script src="help.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

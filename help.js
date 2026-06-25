@@ -1,0 +1,130 @@
+"use strict";
+
+// Help content shown in the "?" modal. Kept as an HTML string so the app stays
+// a dependency-free static site that also runs from file:// without a server.
+window.HELP_HTML = `
+<h2>Lithuanian verb conjugation</h2>
+<p>Lithuanian verbs are sorted into <strong>three conjugations</strong> based on
+the ending of the <strong>3rd person present tense</strong> form (which is the
+same for both singular <em>jis/ji</em> and plural <em>jie/jos</em>).</p>
+
+<table>
+  <tr><th>Conjugation</th><th>3rd person ends in</th><th>Example (3rd p.)</th></tr>
+  <tr><td>1st</td><td><code>-a</code></td><td>dirb<strong>a</strong> (works)</td></tr>
+  <tr><td>2nd</td><td><code>-i</code></td><td>tur<strong>i</strong> (has)</td></tr>
+  <tr><td>3rd</td><td><code>-o</code></td><td>mok<strong>o</strong> (teaches)</td></tr>
+</table>
+
+<div class="note">To find a verb's conjugation you need the 3rd-person present
+form — you cannot always tell it from the infinitive alone. Dictionaries list
+the 3rd-person present and 3rd-person past next to the infinitive for this
+reason, e.g. <code>dirbti, dirba, dirbo</code>.</div>
+
+<h3>Present tense (esamasis laikas)</h3>
+<p>Personal endings are added to the present stem:</p>
+<table>
+  <tr><th>Person</th><th>1st (-a)</th><th>2nd (-i)</th><th>3rd (-o)</th></tr>
+  <tr><td>aš</td><td>-u</td><td>-iu</td><td>-au</td></tr>
+  <tr><td>tu</td><td>-i</td><td>-i</td><td>-ai</td></tr>
+  <tr><td>jis/ji</td><td>-a</td><td>-i</td><td>-o</td></tr>
+  <tr><td>mes</td><td>-ame</td><td>-ime</td><td>-ome</td></tr>
+  <tr><td>jūs</td><td>-ate</td><td>-ite</td><td>-ote</td></tr>
+  <tr><td>jie/jos</td><td>-a</td><td>-i</td><td>-o</td></tr>
+</table>
+<p>Example — <strong>dirbti</strong> (1st): dirbu, dirbi, dirba, dirbame,
+dirbate, dirba.</p>
+
+<h3>Past tense (būtasis kartinis laikas)</h3>
+<p>Built on the past stem (the 3rd-person past form). There are two ending sets
+depending on whether the past stem ends in <code>-o</code> or <code>-ė</code>:</p>
+<table>
+  <tr><th>Person</th><th>-o stem</th><th>-ė stem</th></tr>
+  <tr><td>aš</td><td>-au</td><td>-iau</td></tr>
+  <tr><td>tu</td><td>-ai</td><td>-ei</td></tr>
+  <tr><td>jis/ji</td><td>-o</td><td>-ė</td></tr>
+  <tr><td>mes</td><td>-ome</td><td>-ėme</td></tr>
+  <tr><td>jūs</td><td>-ote</td><td>-ėte</td></tr>
+  <tr><td>jie/jos</td><td>-o</td><td>-ė</td></tr>
+</table>
+<p>Example — <strong>dirbti</strong>: dirbau, dirbai, dirbo… &nbsp;
+<strong>matyti</strong>: ma<strong>č</strong>iau, matei, matė…</p>
+<div class="note"><strong>Consonant alternation:</strong> before the
+<code>-iau</code> ending, <code>t → č</code> and <code>d → dž</code>
+(matyti → ma<strong>č</strong>iau, vesti → ve<strong>dž</strong>iau). The same
+alternation appears in the 1st-person singular present of many 1st-conjugation
+verbs (jausti → jau<strong>č</strong>iu).</div>
+
+<h3>Past frequentative (būtasis dažninis laikas)</h3>
+<p>"Used to / would repeatedly do." Completely regular: take the infinitive stem
+(infinitive minus <code>-ti</code>), add <code>-dav-</code>, then the same
+endings as the 1st conjugation:</p>
+<table>
+  <tr><th>aš</th><th>tu</th><th>jis</th><th>mes</th><th>jūs</th><th>jie</th></tr>
+  <tr><td>-davau</td><td>-davai</td><td>-davo</td><td>-davome</td><td>-davote</td><td>-davo</td></tr>
+</table>
+<p>Example — <strong>dirbti</strong>: dirbdavau, dirbdavai, dirbdavo…</p>
+
+<h3>Future tense (būsimasis laikas)</h3>
+<p>Take the infinitive stem, add <code>-s-</code>, then the endings below:</p>
+<table>
+  <tr><th>aš</th><th>tu</th><th>jis</th><th>mes</th><th>jūs</th><th>jie</th></tr>
+  <tr><td>-siu</td><td>-si</td><td>-s</td><td>-sime</td><td>-site</td><td>-s</td></tr>
+</table>
+<p>Example — <strong>dirbti</strong>: dirbsiu, dirbsi, dirbs, dirbsime,
+dirbsite, dirbs.</p>
+<div class="note"><strong>Future exceptions:</strong> when the stem already ends
+in <code>s, z, š, ž</code>, the cluster simplifies (e.g. <em>vežti</em> →
+veš + … ). These verbs can also collide with present-tense forms, so check a
+dictionary for stems ending in a sibilant.</div>
+
+<h3>Common irregular / tricky verbs</h3>
+<ul>
+  <li><strong>būti</strong> (to be): present esu, esi, <em>yra</em>, esame,
+      esate, yra; future <em>bus</em> in the 3rd person.</li>
+  <li><strong>eiti</strong> (to go): present einu, eini, eina… past ėjau, ėjo…</li>
+  <li><strong>duoti</strong> (to give): present duodu, duodi, duoda… past
+      daviau, davė…</li>
+  <li><strong>rasti</strong> (to find): present ra<strong>nd</strong>u,
+      randa… past radau, rado… (the <code>-nd-</code> appears only in the
+      present).</li>
+  <li><strong>imti</strong> (to take): past ėmiau, ėmė… (stem vowel changes).</li>
+</ul>
+
+<h2>Common verb prefixes</h2>
+<p>Prefixes attach to a base verb and change its meaning — usually adding
+direction, completion (perfective aspect), or a figurative nuance. The same
+base verb can take many prefixes. Examples below use <strong>eiti</strong>
+(to go) and <strong>dėti</strong> (to put) where helpful.</p>
+<table>
+  <tr><th>Prefix</th><th>Core meaning</th><th>Example</th></tr>
+  <tr><td><code>at-</code></td><td>motion toward / back, return, un-doing</td><td>at-eiti (to come / arrive)</td></tr>
+  <tr><td><code>ap-</code></td><td>around, encircling, covering over</td><td>ap-eiti (to walk around)</td></tr>
+  <tr><td><code>be-</code></td><td>continuing / still doing (often with a particle)</td><td>te-be-dirba (is still working)</td></tr>
+  <tr><td><code>į-</code></td><td>into, inward; achieving a result</td><td>į-eiti (to go in, enter)</td></tr>
+  <tr><td><code>iš-</code></td><td>out of, outward; thoroughly / to completion</td><td>iš-eiti (to go out, leave)</td></tr>
+  <tr><td><code>nu-</code></td><td>away, off, downward; completion</td><td>nu-eiti (to go away / to a place)</td></tr>
+  <tr><td><code>pa-</code></td><td>a little / briefly; completion; sub-, beneath</td><td>pa-dėti (to help; to put down)</td></tr>
+  <tr><td><code>par-</code></td><td>back home, return</td><td>par-eiti (to come back home)</td></tr>
+  <tr><td><code>per-</code></td><td>across, through; over-, re-doing</td><td>per-eiti (to cross over)</td></tr>
+  <tr><td><code>pra-</code></td><td>past / by; beginning of an action</td><td>pra-eiti (to pass by); pra-dėti (to begin)</td></tr>
+  <tr><td><code>pri-</code></td><td>toward / up to; adding; a sufficient amount</td><td>pri-eiti (to approach)</td></tr>
+  <tr><td><code>su-</code></td><td>together; completion (perfective)</td><td>su-eiti (to come together, gather)</td></tr>
+  <tr><td><code>už-</code></td><td>behind, beyond; onto; starting / blocking</td><td>už-eiti (to drop by / call in)</td></tr>
+  <tr><td><code>iš-si-</code> / <code>-si-</code></td><td>reflexive (oneself); often combined with prefixes</td><td>mokytis (to learn = teach oneself)</td></tr>
+</table>
+<div class="note"><strong>Notes on prefixes:</strong>
+<ul>
+  <li>Prefixes very often make a verb <em>perfective</em> (one completed action)
+      versus the imperfective base verb (ongoing/repeated). Compare
+      <em>skaityti</em> (to read) vs <em>per-skaityti</em> (to read through to
+      the end).</li>
+  <li>The reflexive particle <code>-si-</code> goes <em>after</em> a prefix but
+      is a <em>suffix</em> <code>-si</code>/<code>-s</code> on an unprefixed
+      verb: <em>prausti → praustis</em>, but <em>nu-si-prausti</em>.</li>
+  <li>Meanings are guidelines, not rules — many prefixed verbs have idiomatic
+      meanings you must learn individually.</li>
+  <li><code>i</code> becomes <code>į</code> (with the nasal hook) as the prefix
+      meaning "into".</li>
+</ul>
+</div>
+`;
