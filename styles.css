@@ -289,6 +289,11 @@ button { font-family: inherit; }
 #help-body .tscroll { overflow-x: auto; margin: 0.5rem 0 1rem; }
 #help-body .tscroll table { margin: 0; white-space: nowrap; }
 #help-body a { color: var(--accent-dark); }
+#help-body .suffix-table { font-size: 0.82rem; }
+#help-body .suffix-table th, #help-body .suffix-table td { text-align: center; padding: 0.3rem 0.45rem; }
+#help-body .suffix-table td:first-child, #help-body .suffix-table th:first-child { text-align: left; }
+#help-body .suffix-table .section th { background: #e4e9ee; }
+#help-body .suffix-table .rare { color: var(--muted); }
 
 /* Verb list modal */
 #list-modal h2 { margin-top: 0; color: var(--accent-dark); }

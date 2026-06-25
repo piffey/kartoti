@@ -559,9 +559,11 @@ function init() {
     if (e.key === "Escape") closeModals();
   });
 
-  // Open with the help dialog rather than a verb, so first-time visitors read
-  // what the app is and how to use it before practising.
-  openHelp();
+  // Open with the tab-agnostic intro rather than a verb, so first-time visitors
+  // read what the app is before practising. Tab-specific rules are then a click
+  // away on the "?" button.
+  document.getElementById("help-body").innerHTML = window.INTRO_HTML || "";
+  openModal(helpModal);
 }
 
 document.addEventListener("DOMContentLoaded", init);

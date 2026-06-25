@@ -1,14 +1,28 @@
 "use strict";
 
-// Help content shown in the "?" modal. Kept as an HTML string so the app stays
-// a dependency-free static site that also runs from file:// without a server.
-window.HELP_HTML = `
+// Help content, kept as HTML strings so the app stays a dependency-free static
+// site that also runs from file:// without a server.
+
+// Shown once when the page first loads — a tab-agnostic intro. Tab-specific
+// rules live in HELP_HTML (verbs) and DECL_HELP_HTML (declensions).
+window.INTRO_HTML = `
 <h2>What is Kartoti?</h2>
 <p><strong>Kartoti</strong> (Lithuanian for "to repeat / to revise") is a
 repetition practice tool for Lithuanian. Use the <strong>tabs</strong> at the top
 to switch between <strong>Verbs</strong> (conjugation) and
-<strong>Declensions</strong> (nouns &amp; adjectives). This page covers the Verbs
-tab — open help again from the Declensions tab for declension rules.</p>
+<strong>Declensions</strong> (nouns &amp; adjectives).</p>
+<p>Each round shows you one word and asks you to type its forms. Your answers are
+checked instantly, with the correct form shown when you slip up — diacritics
+count, so <code>š</code> is not the same as <code>s</code>.</p>
+<div class="note">For the rules and reference tables, press the
+<strong>?</strong> button in the top-right corner. It shows help for whichever
+tab you are on — verb conjugation on the <strong>Verbs</strong> tab, declension
+on the <strong>Declensions</strong> tab.</div>
+`;
+
+// Shown by the "?" button while on the Verbs tab.
+window.HELP_HTML = `
+<h2>Verb practice</h2>
 <p>Each round shows you one verb and asks you to type its forms for every
 grammatical person across the tenses you have switched on. Your answers are
 checked instantly, with the correct form shown when you slip up — diacritics
