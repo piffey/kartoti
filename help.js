@@ -5,11 +5,14 @@
 window.HELP_HTML = `
 <h2>What is Kartoti?</h2>
 <p><strong>Kartoti</strong> (Lithuanian for "to repeat / to revise") is a
-practice tool for Lithuanian verb conjugation. Each round shows you one verb and
-asks you to type its forms for every grammatical person across the tenses you
-have switched on. Your answers are checked instantly, with the correct form
-shown when you slip up — diacritics count, so <code>š</code> is not the same as
-<code>s</code>.</p>
+repetition practice tool for Lithuanian. Use the <strong>tabs</strong> at the top
+to switch between <strong>Verbs</strong> (conjugation) and
+<strong>Declensions</strong> (nouns &amp; adjectives). This page covers the Verbs
+tab — open help again from the Declensions tab for declension rules.</p>
+<p>Each round shows you one verb and asks you to type its forms for every
+grammatical person across the tenses you have switched on. Your answers are
+checked instantly, with the correct form shown when you slip up — diacritics
+count, so <code>š</code> is not the same as <code>s</code>.</p>
 
 <h3>How to use it</h3>
 <ol>

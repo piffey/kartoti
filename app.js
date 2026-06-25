@@ -1,6 +1,23 @@
 "use strict";
 
-// Pronoun labels for the six grammatical persons.
+// ===========================================================================
+// Kartoti — Lithuanian repetition practice. Two modes (tabs): verb conjugation
+// and noun/adjective declension. Both render fill-in inputs into a practice
+// area and share the same grading, clipboard and modal infrastructure.
+// ===========================================================================
+
+// --- Shared constants ------------------------------------------------------
+
+// Lithuanian letters not on a standard English keyboard. Shown in a copy bar so
+// learners can paste tricky characters like "š" (s with a háček) into answers.
+const SPECIAL_CHARS = ["ą", "č", "ę", "ė", "į", "š", "ų", "ū", "ž"];
+
+let activeTab = "verbs"; // "verbs" | "decl"
+let helpModal = null;
+let listModal = null;
+
+// --- Verb mode constants ---------------------------------------------------
+
 const PRONOUNS = [
   { key: "as", label: "aš" },
   { key: "tu", label: "tu" },
@@ -23,13 +40,6 @@ const TENSES = [
   { key: "conditional", name: "Conditional", lt: "tariamoji nuosaka" },
 ];
 
-// Lithuanian letters not on a standard English keyboard. Shown in a copy bar so
-// learners can paste tricky characters like "š" (s with a háček) into answers.
-const SPECIAL_CHARS = ["ą", "č", "ę", "ė", "į", "š", "ų", "ū", "ž"];
-
-// Tracks which tenses are currently shown. Populated in buildTenseToggles.
-const tenseEnabled = {};
-
 const CLASS_NAMES = {
   1: "1st conjugation (3rd person ends in -a)",
   2: "2nd conjugation (3rd person ends in -i)",
@@ -37,7 +47,25 @@ const CLASS_NAMES = {
   irregular: "Irregular verb",
 };
 
+// Tracks which tenses are currently shown. Populated in buildTenseToggles.
+const tenseEnabled = {};
 let currentVerb = null;
+
+// --- Declension mode constants ---------------------------------------------
+
+const CASES = [
+  { key: "nom", short: "Nom.", name: "Nominative", lt: "Vardininkas" },
+  { key: "gen", short: "Gen.", name: "Genitive", lt: "Kilmininkas" },
+  { key: "dat", short: "Dat.", name: "Dative", lt: "Naudininkas" },
+  { key: "acc", short: "Acc.", name: "Accusative", lt: "Galininkas" },
+  { key: "ins", short: "Ins.", name: "Instrumental", lt: "Įnagininkas" },
+  { key: "loc", short: "Loc.", name: "Locative", lt: "Vietininkas" },
+  { key: "voc", short: "Voc.", name: "Vocative", lt: "Šauksmininkas", optional: true },
+];
+const GENDER_NAMES = { masc: "Masculine", fem: "Feminine" };
+
+let includeVocative = true;
+let currentWord = null;
 
 // --- Helpers ---------------------------------------------------------------
 
@@ -47,16 +75,105 @@ function normalize(value) {
   return value.trim().toLowerCase();
 }
 
-function pickRandomVerb() {
-  const verbs = window.VERBS || [];
-  if (verbs.length === 0) return null;
-  // Avoid repeating the same verb twice in a row when possible.
+function pickRandom(list, current, keyOf) {
+  if (!list || list.length === 0) return null;
   let next;
   do {
-    next = verbs[Math.floor(Math.random() * verbs.length)];
-  } while (verbs.length > 1 && currentVerb && next.infinitive === currentVerb.infinitive);
+    next = list[Math.floor(Math.random() * list.length)];
+  } while (list.length > 1 && current && keyOf(next) === keyOf(current));
   return next;
 }
+
+// A single labelled answer row. Used by both verb and declension rendering.
+function makeConjRow(labelText, expected, aria) {
+  const row = document.createElement("div");
+  row.className = "conj-row";
+
+  const label = document.createElement("span");
+  label.className = "pronoun";
+  label.textContent = labelText;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.autocomplete = "off";
+  input.autocapitalize = "off";
+  input.spellcheck = false;
+  input.dataset.expected = expected;
+  input.setAttribute("aria-label", aria);
+  input.addEventListener("blur", () => checkInput(input));
+  input.addEventListener("input", () => {
+    input.classList.remove("correct", "incorrect");
+    const ans = row.querySelector(".answer");
+    if (ans) ans.remove();
+  });
+
+  row.appendChild(label);
+  row.appendChild(input);
+  return row;
+}
+
+// Validate a single input. Empty inputs are left neutral unless revealing.
+function checkInput(input, { reveal = false } = {}) {
+  const expected = input.dataset.expected;
+  const value = input.value;
+
+  if (!reveal && value.trim() === "") {
+    input.classList.remove("correct", "incorrect");
+    return null;
+  }
+
+  const ok = normalize(value) === normalize(expected);
+  input.classList.toggle("correct", ok);
+  input.classList.toggle("incorrect", !ok);
+
+  const row = input.closest(".conj-row");
+  let ans = row.querySelector(".answer");
+  if (!ok) {
+    if (!ans) {
+      ans = document.createElement("span");
+      ans.className = "answer";
+      row.appendChild(ans);
+    }
+    ans.textContent = `→ ${expected}`;
+  } else if (ans) {
+    ans.remove();
+  }
+  return ok;
+}
+
+// Grade every input inside a practice area and report the score.
+function checkArea(root, scoreEl) {
+  const inputs = root.querySelectorAll(".conj-row input");
+  let correct = 0;
+  let answered = 0;
+  inputs.forEach((input) => {
+    const result = checkInput(input);
+    if (result !== null) {
+      answered += 1;
+      if (result) correct += 1;
+    }
+  });
+  if (answered === 0) {
+    scoreEl.textContent = "Fill in some answers first.";
+  } else {
+    scoreEl.textContent = `Score: ${correct} / ${answered} correct` +
+      (answered < inputs.length ? ` (${inputs.length - answered} blank)` : "");
+  }
+}
+
+// Fill blanks and mark the rest inside a practice area.
+function revealArea(root) {
+  root.querySelectorAll(".conj-row input").forEach((input) => {
+    if (input.value.trim() === "") {
+      input.value = input.dataset.expected;
+      input.classList.add("correct");
+    } else {
+      checkInput(input, { reveal: true });
+    }
+  });
+}
+
+// --- Verb mode -------------------------------------------------------------
 
 function activeTenses() {
   return TENSES.filter((t) => tenseEnabled[t.key]);
@@ -94,8 +211,6 @@ function formsFor(verb, tenseKey) {
   if (tenseKey === "conditional") return buildConditional(verb.infinitive);
   return null;
 }
-
-// --- Rendering -------------------------------------------------------------
 
 function renderVerb(verb) {
   currentVerb = verb;
@@ -136,7 +251,7 @@ function renderVerb(verb) {
     exEl.textContent = "";
   }
 
-  document.getElementById("score").textContent = "";
+  document.getElementById("verb-score").textContent = "";
 
   const area = document.getElementById("conjugation-area");
   area.innerHTML = "";
@@ -154,101 +269,14 @@ function renderVerb(verb) {
 
     const rows = document.createElement("div");
     rows.className = "rows";
-
     PRONOUNS.forEach((p) => {
       const expected = forms[p.key];
       if (expected == null) return;
-
-      const row = document.createElement("div");
-      row.className = "conj-row";
-
-      const label = document.createElement("span");
-      label.className = "pronoun";
-      label.textContent = p.label;
-
-      const input = document.createElement("input");
-      input.type = "text";
-      input.autocomplete = "off";
-      input.autocapitalize = "off";
-      input.spellcheck = false;
-      input.dataset.expected = expected;
-      input.setAttribute("aria-label", `${tense.name}, ${p.label}`);
-      input.addEventListener("blur", () => checkInput(input));
-      input.addEventListener("input", () => {
-        // Clear marking while the user edits.
-        input.classList.remove("correct", "incorrect");
-        const ans = row.querySelector(".answer");
-        if (ans) ans.remove();
-      });
-
-      row.appendChild(label);
-      row.appendChild(input);
-      rows.appendChild(row);
+      rows.appendChild(makeConjRow(p.label, expected, `${tense.name}, ${p.label}`));
     });
 
     block.appendChild(rows);
     area.appendChild(block);
-  });
-}
-
-// Validate a single input. Empty inputs are left neutral.
-function checkInput(input, { reveal = false } = {}) {
-  const expected = input.dataset.expected;
-  const value = input.value;
-
-  if (!reveal && value.trim() === "") {
-    input.classList.remove("correct", "incorrect");
-    return null;
-  }
-
-  const ok = normalize(value) === normalize(expected);
-  input.classList.toggle("correct", ok);
-  input.classList.toggle("incorrect", !ok);
-
-  // Show the correct form beneath a wrong answer.
-  const row = input.closest(".conj-row");
-  let ans = row.querySelector(".answer");
-  if (!ok) {
-    if (!ans) {
-      ans = document.createElement("span");
-      ans.className = "answer";
-      row.appendChild(ans);
-    }
-    ans.textContent = `→ ${expected}`;
-  } else if (ans) {
-    ans.remove();
-  }
-  return ok;
-}
-
-function checkAll() {
-  const inputs = document.querySelectorAll(".conj-row input");
-  let correct = 0;
-  let answered = 0;
-  inputs.forEach((input) => {
-    const result = checkInput(input);
-    if (result !== null) {
-      answered += 1;
-      if (result) correct += 1;
-    }
-  });
-  const score = document.getElementById("score");
-  if (answered === 0) {
-    score.textContent = "Fill in some answers first.";
-  } else {
-    score.textContent = `Score: ${correct} / ${answered} correct` +
-      (answered < inputs.length ? ` (${inputs.length - answered} blank)` : "");
-  }
-}
-
-function revealAll() {
-  document.querySelectorAll(".conj-row input").forEach((input) => {
-    if (input.value.trim() === "") {
-      input.value = input.dataset.expected;
-      input.classList.add("correct");
-    } else {
-      checkInput(input, { reveal: true });
-    }
   });
 }
 
@@ -275,6 +303,62 @@ function buildTenseToggles() {
   });
 }
 
+// --- Declension mode -------------------------------------------------------
+
+function activeCases() {
+  return CASES.filter((c) => !c.optional || includeVocative);
+}
+
+// Render one case paradigm (a {nom, gen, …} object) as a titled block of rows.
+function renderParadigm(area, title, formsObj, cases) {
+  const block = document.createElement("section");
+  block.className = "tense-block";
+
+  const h3 = document.createElement("h3");
+  h3.textContent = title;
+  block.appendChild(h3);
+
+  const rows = document.createElement("div");
+  rows.className = "rows";
+  cases.forEach((c) => {
+    const expected = formsObj[c.key];
+    if (expected == null) return;
+    rows.appendChild(makeConjRow(c.short, expected, `${title}, ${c.name}`));
+  });
+
+  block.appendChild(rows);
+  area.appendChild(block);
+}
+
+function renderWord(word) {
+  currentWord = word;
+
+  const prompt = document.getElementById("word-prompt");
+  prompt.classList.remove("hidden");
+  document.getElementById("word-headword").textContent = word.word;
+  document.getElementById("word-translation").textContent = word.translation || "";
+  document.getElementById("word-class").textContent = word.pos === "adj"
+    ? `Adjective ${word.declension}`
+    : `${GENDER_NAMES[word.gender] || ""} noun · ${word.declension}`;
+  document.getElementById("decl-score").textContent = "";
+
+  const area = document.getElementById("declension-area");
+  area.innerHTML = "";
+  const cases = activeCases();
+
+  if (word.pos === "adj") {
+    renderParadigm(area, "Masculine — singular", word.forms.masc.sg, cases);
+    renderParadigm(area, "Masculine — plural", word.forms.masc.pl, cases);
+    renderParadigm(area, "Feminine — singular", word.forms.fem.sg, cases);
+    renderParadigm(area, "Feminine — plural", word.forms.fem.pl, cases);
+  } else {
+    renderParadigm(area, "Singular", word.forms.sg, cases);
+    renderParadigm(area, "Plural", word.forms.pl, cases);
+  }
+}
+
+// --- Clipboard + character bar ---------------------------------------------
+
 // Copy text to the clipboard, with a fallback for non-secure contexts (file://).
 function copyText(text) {
   if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -291,7 +375,6 @@ function copyText(text) {
   return Promise.resolve();
 }
 
-// Build the row of clickable special-character chips.
 function buildCharBar() {
   const container = document.getElementById("char-chips");
   const status = document.getElementById("char-copied");
@@ -314,104 +397,171 @@ function buildCharBar() {
   });
 }
 
-// Build the browsable, filterable list of all verbs. onPick is called with the
-// chosen verb when a list entry is clicked.
-function buildVerbList(onPick) {
-  const list = document.getElementById("verb-list");
-  const filter = document.getElementById("list-filter");
-  const verbs = (window.VERBS || []).slice().sort((a, b) =>
-    a.infinitive.localeCompare(b.infinitive, "lt"));
+// --- Modals (help + list), tab-aware ---------------------------------------
 
-  function render(term) {
-    const q = term.trim().toLowerCase();
-    list.innerHTML = "";
-    let shown = 0;
-    verbs.forEach((verb) => {
-      const tr = (verb.translation || "").toLowerCase();
-      if (q && !verb.infinitive.toLowerCase().includes(q) && !tr.includes(q)) return;
-      shown += 1;
+function closeModals() {
+  helpModal.classList.add("hidden");
+  listModal.classList.add("hidden");
+}
+function openModal(m) {
+  closeModals();
+  m.classList.remove("hidden");
+}
 
-      const li = document.createElement("li");
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "verb-list-item";
+function openHelp() {
+  document.getElementById("help-body").innerHTML =
+    (activeTab === "verbs" ? window.HELP_HTML : window.DECL_HELP_HTML) || "";
+  openModal(helpModal);
+}
 
-      const inf = document.createElement("span");
-      inf.className = "vli-inf";
-      inf.textContent = verb.infinitive;
-      const trans = document.createElement("span");
-      trans.className = "vli-tr";
-      trans.textContent = verb.translation || "";
+// State for the list modal, rebuilt from the active tab each time it opens.
+let listState = null;
 
-      btn.appendChild(inf);
-      btn.appendChild(trans);
-      btn.addEventListener("click", () => onPick(verb));
-      li.appendChild(btn);
-      list.appendChild(li);
-    });
+function renderListItems(term) {
+  const listEl = document.getElementById("entry-list");
+  const q = term.trim().toLowerCase();
+  listEl.innerHTML = "";
+  let shown = 0;
 
-    if (shown === 0) {
-      const li = document.createElement("li");
-      li.className = "verb-list-empty";
-      li.textContent = "No verbs match.";
-      list.appendChild(li);
-    }
+  listState.items.forEach((it) => {
+    const label = listState.label(it);
+    const sub = listState.sub(it);
+    if (q && !label.toLowerCase().includes(q) && !sub.toLowerCase().includes(q)) return;
+    shown += 1;
+
+    const li = document.createElement("li");
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "verb-list-item";
+
+    const a = document.createElement("span");
+    a.className = "vli-inf";
+    a.textContent = label;
+    const b = document.createElement("span");
+    b.className = "vli-tr";
+    b.textContent = sub;
+
+    btn.appendChild(a);
+    btn.appendChild(b);
+    btn.addEventListener("click", () => listState.pick(it));
+    li.appendChild(btn);
+    listEl.appendChild(li);
+  });
+
+  if (shown === 0) {
+    const li = document.createElement("li");
+    li.className = "verb-list-empty";
+    li.textContent = "No matches.";
+    listEl.appendChild(li);
+  }
+}
+
+function openList() {
+  if (activeTab === "verbs") {
+    const items = (window.VERBS || []).slice()
+      .sort((a, b) => a.infinitive.localeCompare(b.infinitive, "lt"));
+    document.getElementById("list-title").textContent = "All verbs";
+    listState = {
+      items,
+      label: (v) => v.infinitive,
+      sub: (v) => v.translation || "",
+      pick: (v) => { renderVerb(v); closeModals(); },
+    };
+  } else {
+    const items = (window.DECL_WORDS || []).slice()
+      .sort((a, b) => a.word.localeCompare(b.word, "lt"));
+    document.getElementById("list-title").textContent = "All words";
+    listState = {
+      items,
+      label: (w) => w.word,
+      sub: (w) => `${w.translation || ""} · ${w.pos === "adj" ? "adj." : "noun"}`,
+      pick: (w) => { renderWord(w); closeModals(); },
+    };
   }
 
-  filter.addEventListener("input", () => render(filter.value));
-  render("");
+  const filter = document.getElementById("list-filter");
+  filter.value = "";
+  renderListItems("");
+  openModal(listModal);
+  filter.focus();
+}
+
+// --- Tabs ------------------------------------------------------------------
+
+function switchTab(tab) {
+  activeTab = tab;
+  const isV = tab === "verbs";
+  document.getElementById("panel-verbs").classList.toggle("hidden", !isV);
+  document.getElementById("panel-decl").classList.toggle("hidden", isV);
+  const tv = document.getElementById("tab-verbs");
+  const td = document.getElementById("tab-decl");
+  tv.classList.toggle("active", isV);
+  td.classList.toggle("active", !isV);
+  tv.setAttribute("aria-selected", String(isV));
+  td.setAttribute("aria-selected", String(!isV));
 }
 
 // --- Init ------------------------------------------------------------------
 
 function init() {
-  const count = (window.VERBS || []).length;
-  document.getElementById("verb-count").textContent =
-    `${count} verb${count === 1 ? "" : "s"} loaded`;
+  const verbCount = (window.VERBS || []).length;
+  const wordCount = (window.DECL_WORDS || []).length;
+  document.getElementById("entry-count").textContent =
+    `${verbCount} verbs · ${wordCount} words loaded`;
 
   buildTenseToggles();
   buildCharBar();
 
+  // Tabs.
+  document.getElementById("tab-verbs").addEventListener("click", () => switchTab("verbs"));
+  document.getElementById("tab-decl").addEventListener("click", () => switchTab("decl"));
+
+  // Verb controls.
   document.getElementById("new-verb-btn").addEventListener("click", () => {
-    const verb = pickRandomVerb();
+    const verb = pickRandom(window.VERBS, currentVerb, (v) => v.infinitive);
     if (verb) renderVerb(verb);
   });
-  document.getElementById("check-btn").addEventListener("click", checkAll);
-  document.getElementById("reveal-btn").addEventListener("click", revealAll);
+  const conjArea = document.getElementById("conjugation-area");
+  document.getElementById("verb-check-btn").addEventListener("click",
+    () => checkArea(conjArea, document.getElementById("verb-score")));
+  document.getElementById("verb-reveal-btn").addEventListener("click",
+    () => revealArea(conjArea));
 
-  // Modal wiring. Each modal closes on its × button, a backdrop click, or Esc.
-  const helpModal = document.getElementById("help-modal");
-  const listModal = document.getElementById("list-modal");
-  const modals = [helpModal, listModal];
-  const closeAll = () => modals.forEach((m) => m.classList.add("hidden"));
-  const open = (m) => { closeAll(); m.classList.remove("hidden"); };
-
-  document.getElementById("help-body").innerHTML = window.HELP_HTML || "";
-  document.getElementById("help-btn").addEventListener("click", () => open(helpModal));
-  document.getElementById("help-close").addEventListener("click", closeAll);
-
-  document.getElementById("list-btn").addEventListener("click", () => {
-    open(listModal);
-    document.getElementById("list-filter").focus();
+  // Declension controls.
+  document.getElementById("new-word-btn").addEventListener("click", () => {
+    const word = pickRandom(window.DECL_WORDS, currentWord, (w) => w.word);
+    if (word) renderWord(word);
   });
-  document.getElementById("list-close").addEventListener("click", closeAll);
+  const declArea = document.getElementById("declension-area");
+  document.getElementById("decl-check-btn").addEventListener("click",
+    () => checkArea(declArea, document.getElementById("decl-score")));
+  document.getElementById("decl-reveal-btn").addEventListener("click",
+    () => revealArea(declArea));
+  document.getElementById("voc-toggle").addEventListener("change", (e) => {
+    includeVocative = e.target.checked;
+    if (currentWord) renderWord(currentWord);
+  });
 
-  modals.forEach((m) => {
-    m.addEventListener("click", (e) => { if (e.target === m) closeAll(); });
+  // Modals.
+  helpModal = document.getElementById("help-modal");
+  listModal = document.getElementById("list-modal");
+  document.getElementById("help-btn").addEventListener("click", openHelp);
+  document.getElementById("help-close").addEventListener("click", closeModals);
+  document.getElementById("list-btn").addEventListener("click", openList);
+  document.getElementById("list-close").addEventListener("click", closeModals);
+  document.getElementById("list-filter").addEventListener("input", (e) => {
+    if (listState) renderListItems(e.target.value);
+  });
+  [helpModal, listModal].forEach((m) => {
+    m.addEventListener("click", (e) => { if (e.target === m) closeModals(); });
   });
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeAll();
-  });
-
-  // Picking a verb from the list renders it and closes the dialog.
-  buildVerbList((verb) => {
-    renderVerb(verb);
-    closeAll();
+    if (e.key === "Escape") closeModals();
   });
 
   // Open with the help dialog rather than a verb, so first-time visitors read
   // what the app is and how to use it before practising.
-  helpModal.classList.remove("hidden");
+  openHelp();
 }
 
 document.addEventListener("DOMContentLoaded", init);

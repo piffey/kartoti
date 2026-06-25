@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Kartoti — Lithuanian Verb Conjugation Practice</title>
+  <title>Kartoti — Lithuanian Repetition Practice</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -11,13 +11,19 @@
   <header class="app-header">
     <div class="title-block">
       <h1>Kartoti</h1>
-      <p class="subtitle">Lithuanian verb conjugation practice</p>
+      <p class="subtitle">Lithuanian conjugation &amp; declension practice</p>
     </div>
     <div class="header-actions">
-      <button id="list-btn" class="help-btn" aria-label="Browse all verbs" title="Browse and pick a verb">☰</button>
-      <button id="help-btn" class="help-btn" aria-label="Show conjugation help" title="Conjugation rules &amp; prefixes">?</button>
+      <button id="list-btn" class="help-btn" aria-label="Browse all words" title="Browse and pick a word">☰</button>
+      <button id="help-btn" class="help-btn" aria-label="Show help" title="Rules &amp; reference">?</button>
     </div>
   </header>
+
+  <!-- Tabs -->
+  <nav class="tabs" role="tablist" aria-label="Practice mode">
+    <button id="tab-verbs" class="tab active" role="tab" aria-selected="true">Verbs</button>
+    <button id="tab-decl" class="tab" role="tab" aria-selected="false">Declensions</button>
+  </nav>
 
   <!-- Special-character copy bar -->
   <section class="char-bar" aria-label="Lithuanian special characters">
@@ -27,61 +33,90 @@
   </section>
 
   <main>
-    <section class="controls">
-      <button id="new-verb-btn" class="primary-btn">New verb</button>
-      <button id="check-btn" class="secondary-btn">Check all</button>
-      <button id="reveal-btn" class="secondary-btn">Reveal answers</button>
+    <!-- Verbs panel -->
+    <section id="panel-verbs" class="panel">
+      <section class="controls">
+        <button id="new-verb-btn" class="primary-btn">New verb</button>
+        <button id="verb-check-btn" class="secondary-btn">Check all</button>
+        <button id="verb-reveal-btn" class="secondary-btn">Reveal answers</button>
+      </section>
+
+      <section class="tense-toggles" aria-label="Tenses and moods to practice">
+        <span class="toggles-label">Show tenses &amp; moods:</span>
+        <div id="tense-toggles" class="toggles"></div>
+      </section>
+
+      <section id="verb-prompt" class="verb-prompt hidden">
+        <h2 id="verb-infinitive"></h2>
+        <p class="principal-parts-label">infinitive · 3rd person present · 3rd person past</p>
+        <p id="verb-translation" class="translation"></p>
+        <p id="verb-governs" class="verb-governs"></p>
+        <p id="verb-example" class="verb-example"></p>
+        <p id="verb-class" class="verb-class"></p>
+        <p id="verb-score" class="score" aria-live="polite"></p>
+      </section>
+
+      <section id="conjugation-area" class="conjugation-area">
+        <p class="placeholder">Click <strong>New verb</strong> to begin.</p>
+      </section>
     </section>
 
-    <section class="tense-toggles" aria-label="Tenses and moods to practice">
-      <span class="toggles-label">Show tenses &amp; moods:</span>
-      <div id="tense-toggles" class="toggles"></div>
-    </section>
+    <!-- Declensions panel -->
+    <section id="panel-decl" class="panel hidden">
+      <section class="controls">
+        <button id="new-word-btn" class="primary-btn">New word</button>
+        <button id="decl-check-btn" class="secondary-btn">Check all</button>
+        <button id="decl-reveal-btn" class="secondary-btn">Reveal answers</button>
+        <label class="case-toggle">
+          <input type="checkbox" id="voc-toggle" checked />
+          Include vocative
+        </label>
+      </section>
 
-    <section id="verb-prompt" class="verb-prompt hidden">
-      <h2 id="verb-infinitive"></h2>
-      <p class="principal-parts-label">infinitive · 3rd person present · 3rd person past</p>
-      <p id="verb-translation" class="translation"></p>
-      <p id="verb-governs" class="verb-governs"></p>
-      <p id="verb-example" class="verb-example"></p>
-      <p id="verb-class" class="verb-class"></p>
-      <p id="score" class="score" aria-live="polite"></p>
-    </section>
+      <section id="word-prompt" class="verb-prompt hidden">
+        <h2 id="word-headword"></h2>
+        <p id="word-translation" class="translation"></p>
+        <p id="word-class" class="verb-class"></p>
+        <p id="decl-score" class="score" aria-live="polite"></p>
+      </section>
 
-    <section id="conjugation-area" class="conjugation-area">
-      <p class="placeholder">Click <strong>New verb</strong> to begin.</p>
+      <section id="declension-area" class="conjugation-area">
+        <p class="placeholder">Click <strong>New word</strong> to begin.</p>
+      </section>
     </section>
   </main>
 
   <!-- Help modal -->
-  <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="help-title">
+  <div id="help-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="Help">
     <div class="modal-content">
       <button id="help-close" class="modal-close" aria-label="Close help">&times;</button>
       <div id="help-body"></div>
     </div>
   </div>
 
-  <!-- Verb list modal -->
-  <div id="list-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="All verbs">
+  <!-- List modal -->
+  <div id="list-modal" class="modal hidden" role="dialog" aria-modal="true" aria-label="All entries">
     <div class="modal-content">
-      <button id="list-close" class="modal-close" aria-label="Close verb list">&times;</button>
-      <h2>All verbs</h2>
-      <p class="list-hint">Click a verb to practise it.</p>
-      <input type="text" id="list-filter" class="list-filter" placeholder="Filter verbs…"
-             autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter verbs" />
-      <ul id="verb-list" class="verb-list"></ul>
+      <button id="list-close" class="modal-close" aria-label="Close list">&times;</button>
+      <h2 id="list-title">All verbs</h2>
+      <p class="list-hint">Click an entry to practise it.</p>
+      <input type="text" id="list-filter" class="list-filter" placeholder="Filter…"
+             autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Filter list" />
+      <ul id="entry-list" class="verb-list"></ul>
     </div>
   </div>
 
   <footer class="app-footer">
-    <p id="verb-count"></p>
+    <p id="entry-count"></p>
     <p class="contact">
       <a href="https://piffey.net/about/" target="_blank" rel="noopener">Contact me</a>
     </p>
   </footer>
 
   <script src="verbs.js"></script>
+  <script src="declensions.js"></script>
   <script src="help.js"></script>
+  <script src="help-decl.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
