@@ -189,15 +189,15 @@ function buildImperative(infinitive) {
 }
 
 // Conditional mood (tariamoji nuosaka) for all six persons. Fully regular:
-// infinitive stem + -čiau / -tum / -tų / -tume / -tute / -tų.
+// infinitive stem + -čiau / -tum / -tų / -tumėme / -tumėte / -tų.
 function buildConditional(infinitive) {
   const stem = infinitive.slice(0, -2);
   return {
     as: stem + "čiau",
     tu: stem + "tum",
     jis: stem + "tų",
-    mes: stem + "tume",
-    jus: stem + "tute",
+    mes: stem + "tumėme",
+    jus: stem + "tumėte",
     jie: stem + "tų",
   };
 }

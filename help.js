@@ -136,13 +136,13 @@ merges with the imperative <code>-k-</code>: <em>laukti</em> → lauk, laukime;
 stem (infinitive minus <code>-ti</code>) and add:</p>
 <table>
   <tr><th>aš</th><th>tu</th><th>jis</th><th>mes</th><th>jūs</th><th>jie</th></tr>
-  <tr><td>-čiau</td><td>-tum</td><td>-tų</td><td>-tume</td><td>-tute</td><td>-tų</td></tr>
+  <tr><td>-čiau</td><td>-tum</td><td>-tų</td><td>-tumėme</td><td>-tumėte</td><td>-tų</td></tr>
 </table>
-<p>Example — <strong>dirbti</strong>: dirbčiau, dirbtum, dirbtų, dirbtume,
-dirbtute, dirbtų. ("Aš dirbčiau" = I would work.)</p>
-<div class="note">You will also hear the longer endings <code>-tumei</code> (tu),
-<code>-tumėme</code> (mes) and <code>-tumėte</code> (jūs); this app uses the
-shorter standard forms.</div>
+<p>Example — <strong>dirbti</strong>: dirbčiau, dirbtum, dirbtų, dirbtumėme,
+dirbtumėte, dirbtų. ("Aš dirbčiau" = I would work.)</p>
+<div class="note">Shorter variants are also accepted — <code>-tumei</code> (tu),
+<code>-tume</code> (mes) and <code>-tute</code> (jūs); this app uses the standard
+<code>-tum</code> / <code>-tumėme</code> / <code>-tumėte</code> forms.</div>
 
 <h2>Cases verbs take</h2>
 <p>Every verb is shown with the <strong>case it governs</strong>, written as the
