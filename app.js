@@ -231,14 +231,18 @@ function renderVerb(verb) {
     CLASS_NAMES[verb.conjugation_class] || "";
 
   // Which case the verb governs, shown as the question word its object answers.
+  // Verbs added without government data leave this blank rather than asserting a
+  // (possibly wrong) "intransitive" label.
   const govEl = document.getElementById("verb-governs");
-  if (verb.governs && verb.governs.q && verb.governs.q !== "—") {
+  if (!verb.governs) {
+    govEl.innerHTML = "";
+  } else if (verb.governs.q && verb.governs.q !== "—") {
     govEl.innerHTML =
       `Takes <strong>${verb.governs.q}</strong>` +
       (verb.governs.case ? ` <span class="case-name">(${verb.governs.case})</span>` : "");
   } else {
     govEl.innerHTML =
-      `<span class="case-name">${(verb.governs && verb.governs.case) || "intransitive"}</span>`;
+      `<span class="case-name">${verb.governs.case || "intransitive"}</span>`;
   }
 
   // One example sentence with its English translation.
