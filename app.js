@@ -401,6 +401,63 @@ function buildCharBar() {
   });
 }
 
+// --- Anki deck export ------------------------------------------------------
+
+// Card fronts. Verbs use the dictionary principal parts (infinitive, 3rd-person
+// present, 3rd-person past); nouns use the nominative singular; adjectives use
+// the masculine + feminine nominative singular so the type is visible.
+function ankiFrontVerb(verb) {
+  return [
+    verb.infinitive,
+    verb.tenses.present && verb.tenses.present.jis,
+    verb.tenses.past && verb.tenses.past.jis,
+  ].filter(Boolean).join(", ");
+}
+
+function ankiFrontWord(word) {
+  if (word.pos === "adj") {
+    return [word.forms.masc.sg.nom, word.forms.fem.sg.nom].filter(Boolean).join(", ");
+  }
+  return word.forms.sg.nom;
+}
+
+// Strip characters that would corrupt a TSV field (tabs / newlines).
+function tsvField(text) {
+  return String(text || "").replace(/[\t\r\n]+/g, " ").trim();
+}
+
+// Build a two-column (front, back) TSV for the active tab. The leading
+// #-directives tell Anki the columns and that fields are plain text.
+function buildAnkiTSV() {
+  const rows = [];
+  if (activeTab === "verbs") {
+    (window.VERBS || []).slice()
+      .sort((a, b) => a.infinitive.localeCompare(b.infinitive, "lt"))
+      .forEach((v) => rows.push([ankiFrontVerb(v), tsvField(v.translation)]));
+  } else {
+    (window.DECL_WORDS || []).slice()
+      .sort((a, b) => a.word.localeCompare(b.word, "lt"))
+      .forEach((w) => rows.push([tsvField(ankiFrontWord(w)), tsvField(w.translation)]));
+  }
+  const header = "#separator:tab\n#html:false\n";
+  return header + rows.map((r) => r.join("\t")).join("\n") + "\n";
+}
+
+function downloadAnkiDeck() {
+  const name = activeTab === "verbs"
+    ? "kartoti-lithuanian-verbs.tsv"
+    : "kartoti-lithuanian-declensions.tsv";
+  const blob = new Blob([buildAnkiTSV()], { type: "text/tab-separated-values;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 // --- Modals (help + list), tab-aware ---------------------------------------
 
 function closeModals() {
@@ -553,6 +610,7 @@ function init() {
   document.getElementById("help-close").addEventListener("click", closeModals);
   document.getElementById("list-btn").addEventListener("click", openList);
   document.getElementById("list-close").addEventListener("click", closeModals);
+  document.getElementById("list-download").addEventListener("click", downloadAnkiDeck);
   document.getElementById("list-filter").addEventListener("input", (e) => {
     if (listState) renderListItems(e.target.value);
   });
