@@ -221,7 +221,7 @@ base verb can take many prefixes. Examples below use <strong>eiti</strong>
   <tr><td><code>pri-</code></td><td>toward / up to; adding; a sufficient amount</td><td>pri-eiti (to approach)</td></tr>
   <tr><td><code>su-</code></td><td>together; completion (perfective)</td><td>su-eiti (to come together, gather)</td></tr>
   <tr><td><code>už-</code></td><td>behind, beyond; onto; starting / blocking</td><td>už-eiti (to drop by / call in)</td></tr>
-  <tr><td><code>iš-si-</code> / <code>-si-</code></td><td>reflexive (oneself); often combined with prefixes</td><td>mokytis (to learn = teach oneself)</td></tr>
+  <tr><td><code>-si-</code></td><td>reflexive particle ("oneself") — <em>not a prefix itself</em>: it is a suffix <code>-si</code>/<code>-s</code> on an unprefixed verb, and moves in after <em>any</em> prefix from the rows above</td><td>mokytis (to learn = teach oneself) → pa<strong>si</strong>mokyti, iš<strong>si</strong>mokyti, nu<strong>si</strong>prausti</td></tr>
 </table>
 <div class="note"><strong>Notes on prefixes:</strong>
 <ul>
